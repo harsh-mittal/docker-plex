@@ -21,6 +21,12 @@ PLEX_MEDIA_SERVER_USER="abc" \
 PLEX_MEDIA_SERVER_INFO_VENDOR="Docker" \
 PLEX_MEDIA_SERVER_INFO_DEVICE="Docker Container (LinuxServer.io)"
 
+ENV UDEV=on
+RUN mkdir -p /usr/src/app~/udev
+COPY udev/usb.rules /etc/udev/rules.d/usb.rules
+COPY udev/copy.sh /usr/src/app~/udev/copy.sh
+RUN chmod +x /usr/src/app~/udev/copy.sh
+
 RUN \
  echo "**** install runtime packages ****" && \
  apt-get update && \
