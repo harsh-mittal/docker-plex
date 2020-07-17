@@ -14,3 +14,4 @@ services:
       - ${DATA}/plex/config/db:/config # plex database
       - ${DATA}/plex/config/transcode:/transcode # temp transcoded files
       - ${DATA}/plex/media:/data # media library
+      - /dev:/dev

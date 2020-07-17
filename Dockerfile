@@ -19,36 +19,30 @@ PLEX_MEDIA_SERVER_HOME="/usr/lib/plexmediaserver" \
 PLEX_MEDIA_SERVER_MAX_PLUGIN_PROCS="6" \
 PLEX_MEDIA_SERVER_USER="abc" \
 PLEX_MEDIA_SERVER_INFO_VENDOR="Docker" \
-PLEX_MEDIA_SERVER_INFO_DEVICE="Docker Container (LinuxServer.io)"
+PLEX_MEDIA_SERVER_INFO_DEVICE="Docker Container (LinuxServer.io)" \
+UDEV=ON
 
-ENV UDEV=on
 RUN mkdir -p /usr/src/app~/udev
 COPY udev/usb.rules /etc/udev/rules.d/usb.rules
 COPY udev/copy.sh /usr/src/app~/udev/copy.sh
 RUN chmod +x /usr/src/app~/udev/copy.sh
 
 RUN \
- echo "**** install runtime packages ****" && \
- apt-get update && \
- apt-get install -y \
-	jq \
-	udev \
-	unrar \
-	wget && \
- echo "**** install plex ****" && \
+echo "**** install runtime packages ****" && \
+apt-get update && apt-get install -y jq udev unrar wget && \
+echo "**** install plex ****" && \
  if [ -z ${PLEX_RELEASE+x} ]; then \
- 	PLEX_RELEASE=$(curl -sX GET 'https://plex.tv/api/downloads/5.json' \
+        PLEX_RELEASE=$(curl -sX GET 'https://plex.tv/api/downloads/5.json' \
 	| jq -r '.computer.Linux.version'); \
  fi && \
- curl -o \
-	/tmp/plexmediaserver.deb -L \
-	"${PLEX_DOWNLOAD}/${PLEX_RELEASE}/debian/plexmediaserver_${PLEX_RELEASE}_${PLEX_ARCH}.deb" && \
- dpkg -i /tmp/plexmediaserver.deb && \
- echo "**** ensure abc user's home folder is /app ****" && \
- usermod -d /app abc && \
- echo "**** cleanup ****" && \
- apt-get clean && \
- rm -rf \
+echo "${PLEX_DOWNLOAD}/${PLEX_RELEASE}/debian/plexmediaserver_${PLEX_RELEASE}_${PLEX_ARCH}.deb" && \
+curl -o /tmp/plexmediaserver.deb -L "${PLEX_DOWNLOAD}/${PLEX_RELEASE}/debian/plexmediaserver_${PLEX_RELEASE}_${PLEX_ARCH}.deb" && \
+dpkg -i /tmp/plexmediaserver.deb && \
+echo "**** ensure abc user's home folder is /app ****" && \
+usermod -d /app abc && \
+echo "**** cleanup ****" && \
+apt-get clean && \
+rm -rf \
 	/etc/default/plexmediaserver \
 	/tmp/* \
 	/var/lib/apt/lists/* \
